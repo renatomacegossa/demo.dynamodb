@@ -3,6 +3,7 @@ package br.com.rmd.demo.dynamo.repository;
 import br.com.rmd.demo.dynamo.model.Analitico;
 import br.com.rmd.demo.dynamo.model.Consolidado;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.datamodeling.TransactionWriteRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -14,15 +15,19 @@ public class RegistraEventoRepository {
 
     public void registrar(Analitico analitico) {
 
-        dynamoDBMapper.save( analitico );
+        TransactionWriteRequest transactionWriteRequest = new TransactionWriteRequest();
 
         Consolidado consolidado = dynamoDBMapper.load( Consolidado.class, analitico.getUsuario(), analitico.getProduto() );
+
+        transactionWriteRequest.addPut( analitico );
 
         if ( consolidado != null ) {
 
             consolidado.setQuantidadeAcumulada(
                     consolidado.getQuantidadeAcumulada() + analitico.getQuantidade()
             );
+
+            transactionWriteRequest.addUpdate( consolidado );
         }
         else {
             consolidado = new Consolidado(
@@ -31,10 +36,10 @@ public class RegistraEventoRepository {
                     analitico.getQuantidade(),
                     null
             );
+
+            transactionWriteRequest.addPut( consolidado );
         }
 
-        dynamoDBMapper.save( consolidado );
-
-
+        dynamoDBMapper.transactionWrite( transactionWriteRequest );
     }
 }
