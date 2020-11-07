@@ -3,8 +3,10 @@ package br.com.rmd.demo.dynamo.model;
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 @DynamoDBTable( tableName = "Consolidado" )
 public class Consolidado {

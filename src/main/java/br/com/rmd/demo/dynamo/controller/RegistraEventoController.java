@@ -21,7 +21,7 @@ public class RegistraEventoController {
                 RandomStringUtils.randomAlphanumeric( 4 ),
                 "68916022",
                 "livro",
-                0,
+                1,
                 null
         );
 

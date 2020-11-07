@@ -16,13 +16,25 @@ public class RegistraEventoRepository {
 
         dynamoDBMapper.save( analitico );
 
-        Consolidado consolidado = new Consolidado(
-                analitico.getUsuario(),
-                analitico.getProduto(),
-                analitico.getQuantidade(),
-                null
-        );
+        Consolidado consolidado = dynamoDBMapper.load( Consolidado.class, analitico.getUsuario(), analitico.getProduto() );
+
+        if ( consolidado != null ) {
+
+            consolidado.setQuantidadeAcumulada(
+                    consolidado.getQuantidadeAcumulada() + analitico.getQuantidade()
+            );
+        }
+        else {
+            consolidado = new Consolidado(
+                    analitico.getUsuario(),
+                    analitico.getProduto(),
+                    analitico.getQuantidade(),
+                    null
+            );
+        }
 
         dynamoDBMapper.save( consolidado );
+
+
     }
 }
